@@ -9,7 +9,7 @@ from typing import Any, Optional, Union
 import numpy as np
 import torch
 from torch import Tensor, float32
-from torch.distributions import Independent, Uniform
+from torch.distributions import Independent, Uniform, LogNormal
 
 from sbi import utils as utils
 from sbi.types import Array, OneOrMore, ScalarFloat
@@ -277,6 +277,28 @@ class BoxUniform(Independent):
             reinterpreted_batch_ndims,
         )
 
+class LogNormalPrior(Independent):
+    def __init__(
+        self,
+        mean: ScalarFloat,
+        sd: ScalarFloat,
+        reinterpreted_batch_ndims: int = 1,
+        device: str = "cpu",
+    ):
+
+        device = process_device(device)
+        super().__init__(
+            LogNormal(
+                loc=torch.as_tensor(
+                    mean, dtype=torch.float32, device=torch.device(device)
+                ),
+                scale=torch.as_tensor(
+                    sd, dtype=torch.float32, device=torch.device(device)
+                ),
+                validate_args=False,
+            ),
+            reinterpreted_batch_ndims,
+        )
 
 def ensure_theta_batched(theta: Tensor) -> Tensor:
     r"""
