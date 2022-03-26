@@ -125,8 +125,8 @@ def lo_simulation(rates):
 
     ## Update rates based on sample from prior
     rate_names = [
-        'GluPermease_Kd__',
-        'LacPermease_Kd__',
+        'LacPermease_vmax',
+        'LacPermease_Kd',
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
@@ -160,9 +160,12 @@ end-start
 
 # Only uniform prior implemented into sbi package currently
 # Easy to add more manually, for example log normal
-prior = utils.BoxUniform(
-    low=torch.tensor([9000.,  8799900.]),
-    high=torch.tensor([9050.,  8800100.]),)
+# prior = utils.BoxUniform(
+#     low=torch.tensor([9000.,  8799900.]),
+#     high=torch.tensor([9050.,  8800100.]),)
+prior = utils.NormalPrior(
+    torch.tensor([35.8, 156576.]),
+    torch.tensor([4., 1600.]))
 
 # Train model
 num_sim = 200
@@ -177,50 +180,54 @@ posterior = infer(
 
 
 # Sample some observations with known ground truth
-obs = torch.tensor(np.array([lo_simulation([9033., 8800000.]).numpy() for _ in range(10)]))
+obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(10)]))
+obs2 = torch.tensor(np.array([lo_simulation([5., 86576.]).numpy() for _ in range(10)]))
+obs3 = torch.tensor(np.array([lo_simulation([80., 306576.]).numpy() for _ in range(10)]))
 obs0 = lo_simulation([15000., 8800000.])
 obs1 = lo_simulation([9033., 7000000.])
 obs = [obs0, obs1]
 
-plot_df = obs[0].reshape((int(len(obs[0])/12),12))
-plot_df1 = obs[1].reshape((int(len(obs[1])/12),12))
+plot_df = [obs[i].reshape((int(len(obs[0])/12),12)) for i in range(len(obs))]
+plot_df1 = [obs2[i].reshape((int(len(obs2[0])/12),12)) for i in range(len(obs2))]
+plot_df2 = [obs3[i].reshape((int(len(obs3[0])/12),12)) for i in range(len(obs3))]
 # plot_df2 = obs[2].reshape((int(len(obs[2])/12),12))
 
-fig, ax = plt.subplots(1,2,figsize=(12,10))
-ax[0].plot(plot_df[:, 11], plot_df[:, 1], color = "blue")
-ax[0].plot(plot_df[:, 11], plot_df[:, 2], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 3], color = "blue")
-ax[0].plot(plot_df[:, 11], plot_df[:, 4], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 5], color = "blue")
-ax[0].plot(plot_df[:, 11], plot_df[:, 6], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 7], color = "blue")
-ax[0].plot(plot_df[:, 11], plot_df[:, 8], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 9], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 10], color = "red")
-ax[0].plot(plot_df[:, 11], plot_df[:, 0], color = "red")
+fig, ax = plt.subplots(1,3,figsize=(12,10))
+n = 0
+for i in [plot_df, plot_df1, plot_df2]:
+    ax[n].plot(i[0][:, 11], i[0][:, 3], color = "blue")
+    ax[n].plot(i[1][:, 11], i[1][:, 3], color = "blue")
+    ax[n].plot(i[2][:, 11], i[2][:, 3], color = "blue")
+    ax[n].plot(i[3][:, 11], i[3][:, 3], color = "blue")
+    ax[n].plot(i[4][:, 11], i[4][:, 3], color = "blue")
+    ax[n].plot(i[5][:, 11], i[5][:, 3], color = "blue")
+    ax[n].plot(i[6][:, 11], i[6][:, 3], color = "blue")
+    ax[n].plot(i[7][:, 11], i[7][:, 3], color = "blue")
+    ax[n].plot(i[8][:, 11], i[8][:, 3], color = "blue")
+    ax[n].plot(i[9][:, 11], i[9][:, 3], color = "blue")
 
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 1], color = "blue")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 2], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 3], color = "blue")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 4], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 5], color = "blue")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 6], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 7], color = "blue")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 8], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 9], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 10], color = "red")
-ax[1].plot(plot_df1[:, 11], plot_df1[:, 0], color = "red")
+    ax[n].plot(i[0][:, 11], i[0][:, 10], color = "red")
+    ax[n].plot(i[1][:, 11], i[1][:, 10], color = "red")
+    ax[n].plot(i[2][:, 11], i[2][:, 10], color = "red")
+    ax[n].plot(i[3][:, 11], i[3][:, 10], color="red")
+    ax[n].plot(i[4][:, 11], i[4][:, 10], color="red")
+    ax[n].plot(i[5][:, 11], i[5][:, 10], color="red")
+    ax[n].plot(i[6][:, 11], i[6][:, 10], color="red")
+    ax[n].plot(i[7][:, 11], i[7][:, 10], color="red")
+    ax[n].plot(i[8][:, 11], i[8][:, 10], color="red")
+    ax[n].plot(i[9][:, 11], i[9][:, 10], color="red")
+    n += 1
 
 plt.show()
 
-samples = posterior.sample((200,), x=obs) # SNPE only works with one obs, SNLE will work with more
+samples = posterior.sample((500,), x=obs) # SNPE only works with one obs, SNLE will work with more
 
 # plot results
 fig, ax = plt.subplots(1, 2, figsize=(10,6))
-ax[0].hist(samples[:, 0].numpy(), bins=15)
-ax[1].hist(samples[:, 1].numpy(), bins=15)
-ax[0].axvline(x = 9033., color = "red")
-ax[1].axvline(x = 8800000., color = "red")
+ax[0].hist(samples[250:, 0].numpy(), bins=15)
+ax[1].hist(samples[250:, 1].numpy(), bins=15)
+ax[0].axvline(x = 35.8, color = "red")
+ax[1].axvline(x = 156576., color = "red")
 
 ax[0].set_title("GluPermease_Kd samples")
 ax[1].set_title("LacPermease_Kd samples")

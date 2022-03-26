@@ -32,6 +32,7 @@ from sbi.utils.sbiutils import (
 )
 from sbi.utils.torchutils import (
     BoxUniform,
+    NormalPrior,
     LogNormalPrior,
     assert_all_finite,
     cbrt,
