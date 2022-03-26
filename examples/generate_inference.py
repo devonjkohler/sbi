@@ -12,7 +12,7 @@ import itertools
 ## Lac Operon
 def lo_simulation(rates):
 
-    sbml_model = Model(sbml_filename=r"LacOperon_stochastic.xml", sbml_warnings=False)
+    sbml_model = Model(sbml_filename=r"/home/kohler.d/biosim_project/sbi/examples/LacOperon_stochastic.xml", sbml_warnings=False)
 
     ## Update rates based on sample from prior
     rate_names = [
@@ -112,7 +112,7 @@ def main():
             run_time = run_time,
             samples = inference_run.posterior_samples)
 
-        with open('sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open('/home/kohler.d/biosim_project/sbi/examples/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
