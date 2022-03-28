@@ -76,13 +76,13 @@ def main():
         torch.tensor([2., 800.])
     )]
 
-    n_sims = [10]#, 250, 500]
+    n_sims = [20]#, 250, 500]
 
-    inference_methods = ["SNRE"]#, "SNLE", "SNRE"]
+    inference_methods = ["SNPE"]#, "SNLE", "SNRE"]
 
     n_obs = [1]#,5,20]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(2)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(1)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
