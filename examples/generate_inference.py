@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 20000, 10.)
+    timepoints = np.arange(0, 1000, 10.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
@@ -115,7 +115,7 @@ def main():
             run_time = run_time,
             samples = inference_run.posterior_samples)
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_test_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved")
 if __name__ == '__main__':
