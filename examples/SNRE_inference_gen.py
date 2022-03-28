@@ -124,7 +124,7 @@ def main():
             samples = inference_run.posterior_samples)
 
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNRE_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved")
 if __name__ == '__main__':
