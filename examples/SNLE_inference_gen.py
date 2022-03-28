@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 1000, 10.)
+    timepoints = np.arange(0, 20000, 10.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
