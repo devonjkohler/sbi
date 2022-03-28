@@ -78,7 +78,7 @@ def main():
 
     n_sims = [10]#, 250, 500]
 
-    inference_methods = ["SNPE"]#, "SNLE", "SNRE"]
+    inference_methods = ["SNRE"]#, "SNLE", "SNRE"]
 
     n_obs = [1]#,5,20]
     obs = list()
@@ -95,6 +95,7 @@ def main():
         start = time.time()
 
         ## Run inference
+        print("starting inference")
         inference_run = InferPosterior(parameters[i])
         inference_run.train()
         print("inference finished")
