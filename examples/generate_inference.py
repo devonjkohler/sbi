@@ -76,13 +76,13 @@ def main():
         torch.tensor([2., 800.])
     )]
 
-    n_sims = [100, 250, 500]
+    n_sims = [10]#, 250, 500]
 
-    inference_methods = ["SNPE", "SNLE", "SNRE"]
+    inference_methods = ["SNPE"]#, "SNLE", "SNRE"]
 
-    n_obs = [1,5,20]
+    n_obs = [1]#,5,20]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(20)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(2)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
@@ -97,7 +97,9 @@ def main():
         ## Run inference
         inference_run = InferPosterior(parameters[i])
         inference_run.train()
+        print("inference finished")
         inference_run.sample_posterior()
+        print("posterior_sampled")
 
         end = time.time()
         run_time = end - start
@@ -111,9 +113,9 @@ def main():
             parameters = save_params,
             run_time = run_time,
             samples = inference_run.posterior_samples)
-
+        print("trying to save")
         with open(r'/scratch/kohler.d/code_output/biosim/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
+        print("saved")
 if __name__ == '__main__':
     main()
