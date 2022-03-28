@@ -83,7 +83,7 @@ def main():
     n_sims = [100, 250, 500]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
-    inference_methods = ["SNPE"]
+    inference_methods = ["SNRE"]
 
     ## Num obs to use to learn posterior
     n_obs = [1,5,20]
