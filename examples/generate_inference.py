@@ -112,7 +112,7 @@ def main():
             run_time = run_time,
             samples = inference_run.posterior_samples)
 
-        with open(r'/home/kohler.d/biosim_project/sbi/examples/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
