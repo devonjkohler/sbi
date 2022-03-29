@@ -80,7 +80,7 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [100, 250, 500]
+    n_sims = [500]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
     inference_methods = ["SNLE"]
@@ -113,18 +113,18 @@ def main():
 
         ## What parameters to save
         save_params = dict(
-            number_sims = parameters[i][1],
-            method = parameters[i][2],
-            number_obs = len(parameters[i][3]))
+            number_sims=parameters[i][1],
+            method=parameters[i][2],
+            number_obs=len(parameters[i][3]))
 
         ## Save all needed data
         results_file = dict(
-            parameters = save_params,
-            run_time = run_time,
-            samples = inference_run.posterior_samples)
+            parameters=save_params,
+            run_time=run_time,
+            samples=inference_run.posterior_samples)
 
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNLE_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNLE_500_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved")
 if __name__ == '__main__':
