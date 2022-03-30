@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 20000, 10.)
+    timepoints = np.arange(0, 30000, 10.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
@@ -80,15 +80,15 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [500]
+    n_sims = [50, 1000]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
     inference_methods = ["SNLE"]
 
     ## Num obs to use to learn posterior
-    n_obs = [1,5,20]
+    n_obs = [1]#,5,20]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(20)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(1)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
@@ -124,7 +124,7 @@ def main():
             samples=inference_run.posterior_samples)
 
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNLE_500_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNLE_test_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved")
 if __name__ == '__main__':
