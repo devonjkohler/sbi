@@ -66,7 +66,7 @@ class InferPosterior:
 
     def sample_posterior(self):
 
-        samples = self.posterior.sample((300,), x=self.observations)
+        samples = self.posterior.sample((1500,), x=self.observations)
 
         self.posterior_samples = samples
 
@@ -80,13 +80,13 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [500]
+    n_sims = [100]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
     inference_methods = ["SNRE"]
 
     ## Num obs to use to learn posterior
-    n_obs = [1,5,20]
+    n_obs = [5,20]
     obs = list()
     temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(20)]))
     ## Generate observations
@@ -124,7 +124,7 @@ def main():
             samples=inference_run.posterior_samples)
 
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNRE_500_{0}.pickle'.format(str(i)), 'wb') as handle:
+        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNRE_high_sample_{0}.pickle'.format(str(i)), 'wb') as handle:
             pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
         print("saved")
 if __name__ == '__main__':
