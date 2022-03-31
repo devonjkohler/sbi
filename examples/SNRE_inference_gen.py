@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 20000, 10.)
+    timepoints = np.arange(0, 30000, 10.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
@@ -66,7 +66,7 @@ class InferPosterior:
 
     def sample_posterior(self):
 
-        samples = self.posterior.sample((1500,), x=self.observations)
+        samples = self.posterior.sample((5000,), x=self.observations)
 
         self.posterior_samples = samples
 
@@ -80,7 +80,7 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [100]
+    n_sims = [250]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
     inference_methods = ["SNRE"]
