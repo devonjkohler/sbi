@@ -68,7 +68,7 @@ class InferPosterior:
 
     def sample_posterior(self):
 
-        samples = self.posterior.sample((300,), x=self.observations)
+        samples = self.posterior.sample((2000,), x=self.observations)
 
         self.posterior_samples = samples
 
@@ -78,7 +78,7 @@ def main():
     ## Define Prior
     prior_params = [utils.NormalPrior(
         torch.tensor([35.8, 156576.]),
-        torch.tensor([2., 800.])
+        torch.tensor([3., 1000.])
     )]
 
     # Num sims to use to train nn
@@ -90,7 +90,7 @@ def main():
     ## Num obs to use to learn posterior
     n_obs = [1]#,5,20]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([40.5, 160000.]).numpy() for _ in range(1)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([38.5, 158500.]).numpy() for _ in range(1)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
