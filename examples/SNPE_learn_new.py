@@ -90,7 +90,7 @@ def main():
     ## Num obs to use to learn posterior
     n_obs = [1]#,5,20]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([38.5, 158500.]).numpy() for _ in range(1)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([45.0, 165000.]).numpy() for _ in range(1)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
