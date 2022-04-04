@@ -78,7 +78,7 @@ def main():
     ## Define Prior
     prior_params = [utils.NormalPrior(
         torch.tensor([35.8, 156576.]),
-        torch.tensor([3., 1000.])
+        torch.tensor([10., 8000.])
     )]
 
     # Num sims to use to train nn

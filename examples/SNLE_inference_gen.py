@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 30000, 10.)
+    timepoints = np.arange(0, 30001, 1000.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
@@ -80,7 +80,7 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [50, 1000]
+    n_sims = [50, 250]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
     inference_methods = ["SNLE"]
