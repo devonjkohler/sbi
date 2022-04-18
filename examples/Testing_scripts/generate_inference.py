@@ -12,7 +12,7 @@ import itertools
 ## Lac Operon
 def lo_simulation(rates):
 
-    sbml_model = Model(sbml_filename=r"/home/kohler.d/biosim_project/sbi/examples/LacOperon_stochastic.xml", sbml_warnings=False)
+    sbml_model = Model(sbml_filename=r"../LacOperon_stochastic.xml", sbml_warnings=False)
 
     ## Update rates based on sample from prior
     rate_names = [
@@ -21,7 +21,7 @@ def lo_simulation(rates):
     ]
     sbml_model.set_params(dict(zip(rate_names, rates)))
 
-    timepoints = np.arange(0, 1000, 10.)
+    timepoints = np.arange(0, 20000, 10.)
 
     #Create an Interface Model --> Cython
     interface = ModelCSimInterface(sbml_model)
@@ -80,15 +80,15 @@ def main():
     )]
 
     # Num sims to use to train nn
-    n_sims = [100, 250, 500]
+    n_sims = [10]
 
     ## Type of inference to use - one of "SNPE", "SNLE", "SNRE"
-    inference_methods = ["SNPE"]
+    inference_methods = ["SNRE"]
 
     ## Num obs to use to learn posterior
-    n_obs = [1,5,20]
+    n_obs = [1]
     obs = list()
-    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(20)]))
+    temp_obs = torch.tensor(np.array([lo_simulation([35.8, 156576.]).numpy() for _ in range(1)]))
     ## Generate observations
     for i in n_obs:
         obs.append(temp_obs[:i])
@@ -113,19 +113,19 @@ def main():
 
         ## What parameters to save
         save_params = dict(
-            number_sims = parameters[i][1],
-            method = parameters[i][2],
-            number_obs = len(parameters[i][3]))
+            number_sims=parameters[i][1],
+            method=parameters[i][2],
+            number_obs=len(parameters[i][3]))
 
         ## Save all needed data
         results_file = dict(
-            parameters = save_params,
-            run_time = run_time,
-            samples = inference_run.posterior_samples)
+            parameters=save_params,
+            run_time=run_time,
+            samples=inference_run.posterior_samples)
 
         print("trying to save")
-        with open(r'/scratch/kohler.d/code_output/biosim/sim_results_{0}.pickle'.format(str(i)), 'wb') as handle:
-            pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        print("saved")
+        # with open(r'/scratch/kohler.d/code_output/biosim/sim_results_SNRE_500_{0}.pickle'.format(str(i)), 'wb') as handle:
+        #     pickle.dump(results_file, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # print("saved")
 if __name__ == '__main__':
     main()
