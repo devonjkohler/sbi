@@ -213,7 +213,7 @@ def main():
 
     # defining the model
     model = Net()
-    optimizer = Adam(model.parameters(), lr=0.005)
+    optimizer = Adam(model.parameters(), lr=0.0005)
     criterion = CrossEntropyLoss()
 
     if torch.cuda.is_available():
@@ -222,7 +222,7 @@ def main():
 
     # defining the number of epochs
     n_epochs = 20
-    batch_size = 500
+    batch_size = 64
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
