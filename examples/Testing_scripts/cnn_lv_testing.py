@@ -223,7 +223,7 @@ def main():
 
     # defining the number of epochs
     n_epochs = 20
-    batch_size = 256
+    batch_size = 290
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
