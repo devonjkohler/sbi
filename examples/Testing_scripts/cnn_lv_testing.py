@@ -7,6 +7,7 @@ import torch
 from torch.nn import Conv2d, ReLU, Linear, Sequential, MaxPool2d, AvgPool2d, Dropout, Module, CrossEntropyLoss
 from torch.autograd import Variable
 from torch.optim import Adam
+from torch.utils.data import Dataset, DataLoader
 
 from sklearn.model_selection import train_test_split
 
@@ -100,8 +101,28 @@ class Net(Module):
 
         return x
 
+## Define class to batch data
+class TraceDataSet(Dataset):
+
+  def __init__(self, X, Y):
+    self.X = X
+    self.Y = Y
+    if len(self.X) != len(self.Y):
+      raise Exception("The length of X does not match the length of Y")
+
+  def __len__(self):
+    return len(self.X)
+
+  def __getitem__(self, index):
+    # note that this isn't randomly selecting. It's a simple get a single item that represents an x and y
+    _x = self.X[index]
+    _y = self.Y[index]
+
+    return _x, _y
+
 ## CNN train function
-def train(epoch, model, train_x, train_y, val_x, val_y, optimizer, criterion, train_losses, val_losses):
+def train(epoch, batch, model, train_x, train_y, val_x, val_y,
+          optimizer, criterion, train_losses, val_losses):
     model.train()
     tr_loss = 0
     # getting the training set
@@ -132,7 +153,7 @@ def train(epoch, model, train_x, train_y, val_x, val_y, optimizer, criterion, tr
     loss_train.backward()
     optimizer.step()
     tr_loss = loss_train.item()
-    if epoch % 2 == 0:
+    if epoch % 2 == 0 & batch == 500:
         # printing the validation loss
         print('Epoch : ', epoch + 1, '\t', 'val loss :', loss_val)
         print('Epoch : ', epoch + 1, '\t', 'train loss :', loss_train)
@@ -140,31 +161,38 @@ def train(epoch, model, train_x, train_y, val_x, val_y, optimizer, criterion, tr
 
 def main():
 
-    ## Prior used to train nn (need it to span area for inference)
-    prior = utils.BoxUniform(
-        torch.tensor([0.001, 0.0001, 0.001]),
-        torch.tensor([0.05, 0.02, 0.1])
-    )
+    # # Prior used to train nn (need it to span area for inference)
+    # prior = utils.BoxUniform(
+    #     torch.tensor([0.001, 0.0001, 0.001]),
+    #     torch.tensor([0.05, 0.02, 0.1])
+    # )
+    #
+    # # Sample 10000 traces
+    # obs_list = list()
+    # labels = list()
+    # for i in range(10000):
+    #     prior_sample = prior.sample()
+    #     labels.append(prior_sample)
+    #     obs_list.append(gillespie_simulator(prior_sample))
+    #
+    # x = torch.stack(obs_list, axis=0)
+    # y = torch.stack(labels, axis=0)
 
-    ## Sample 10000 traces
-    obs_list = list()
-    labels = list()
-    for i in range(10000):
-        prior_sample = prior.sample()
-        labels.append(prior_sample)
-        obs_list.append(gillespie_simulator(prior_sample))
+    # # Save observations
+    # print("trying to save cnn obs")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs.pickle', 'wb') as handle:
+    #     pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("trying to save cnn labels")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels.pickle', 'wb') as handle:
+    #     pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("saved")
 
-    x = torch.stack(obs_list, axis=0)
-    y = torch.stack(labels, axis=0)
-
-    ## Save observations
-    print("trying to save cnn obs")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs.pickle', 'wb') as handle:
-        pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print("trying to save cnn labels")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels.pickle', 'wb') as handle:
-        pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print("saved")
+    print("loading data")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs.pickle', 'rb') as handle:
+        x = pickle.load(handle)
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels.pickle', 'rb') as handle:
+        y = pickle.load(handle)
+    print("data loaded")
 
     ## Prepare data
     v0_min = x[:, 0].min()
@@ -193,15 +221,24 @@ def main():
         criterion = criterion.cuda()
 
     # defining the number of epochs
-    n_epochs = 50
+    n_epochs = 20
+    batch_size = 500
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
     val_losses = []
+
+    loader = iter(DataLoader(TraceDataSet(train_x, train_y), batch_size=batch_size, shuffle=True))
+
     # training the model
     for epoch in range(n_epochs):
-        train(epoch, model, train_x, train_y, val_x,
-              val_y, optimizer, criterion, train_losses, val_losses)
+        print("epoch:{0}".format(str(epoch)))
+        for i in range(0, train_x.size()[0], batch_size):
+            print("batch:{0}".format(str(i)))
+            batch_x, batch_y = loader.next()
+
+            train(epoch, i, model, batch_x, batch_y, val_x,
+                  val_y, optimizer, criterion, train_losses, val_losses)
 
     losses = {"train" : train_losses, "val" : val_losses}
 
