@@ -193,7 +193,8 @@ def main():
     with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels.pickle', 'rb') as handle:
         y = pickle.load(handle)
     print("data loaded")
-
+    x = x[:1500]
+    y = y[:1500]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
@@ -222,7 +223,7 @@ def main():
 
     # defining the number of epochs
     n_epochs = 20
-    batch_size = 64
+    batch_size = 256
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
