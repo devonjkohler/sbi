@@ -209,8 +209,8 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(9500, 1, 3, 3000)
-    val_x = val_x.reshape(500, 1, 3, 3000)
+    train_x = train_x.reshape(1425, 1, 3, 3000)
+    val_x = val_x.reshape(75, 1, 3, 3000)
 
     # defining the model
     model = Net()
