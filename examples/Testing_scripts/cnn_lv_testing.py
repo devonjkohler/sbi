@@ -121,7 +121,7 @@ class TraceDataSet(Dataset):
     return _x, _y
 
 ## CNN train function
-def train(epoch, batch, model, train_x, train_y, val_x, val_y,
+def train(epoch, model, train_x, train_y, val_x, val_y,
           optimizer, criterion, train_losses, val_losses):
     model.train()
     tr_loss = 0
@@ -130,11 +130,11 @@ def train(epoch, batch, model, train_x, train_y, val_x, val_y,
     # getting the validation set
     x_val, y_val = Variable(val_x), Variable(val_y)
     # converting the data into GPU format
-    if torch.cuda.is_available():
-        x_train = x_train.cuda()
-        y_train = y_train.cuda()
-        x_val = x_val.cuda()
-        y_val = y_val.cuda()
+    # if torch.cuda.is_available():
+    #     x_train = x_train.cuda()
+    #     y_train = y_train.cuda()
+    #     x_val = x_val.cuda()
+    #     y_val = y_val.cuda()
 
     # clearing the Gradients of the model parameters
     optimizer.zero_grad()
@@ -153,10 +153,10 @@ def train(epoch, batch, model, train_x, train_y, val_x, val_y,
     loss_train.backward()
     optimizer.step()
     tr_loss = loss_train.item()
-    if epoch % 2 == 0 & batch == 500:
+    # if epoch % 256 == 0:
         # printing the validation loss
-        print('Epoch : ', epoch + 1, '\t', 'val loss :', loss_val)
-        print('Epoch : ', epoch + 1, '\t', 'train loss :', loss_train)
+    print('epoch : ', epoch + 1, '\t', 'val loss :', loss_val)
+    print('epoch : ', epoch + 1, '\t', 'train loss :', loss_train)
 
 
 def main():
@@ -192,6 +192,10 @@ def main():
         x = pickle.load(handle)
     with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels.pickle', 'rb') as handle:
         y = pickle.load(handle)
+    # with open(r'../../../cnn_lv_obs.pickle', 'rb') as handle:
+    #     x = pickle.load(handle)
+    # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
+    #     y = pickle.load(handle)
     print("data loaded")
     x = x[:1500]
     y = y[:1500]
@@ -217,31 +221,42 @@ def main():
     optimizer = Adam(model.parameters(), lr=0.0005)
     criterion = CrossEntropyLoss()
 
-    if torch.cuda.is_available():
-        model = model.cuda()
-        criterion = criterion.cuda()
+    # if torch.cuda.is_available():
+    #     model = model.cuda()
+    #     criterion = criterion.cuda()
 
     # defining the number of epochs
     n_epochs = 20
-    batch_size = 290
+    batch_size = 512
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
     val_losses = []
 
-    loader = iter(DataLoader(TraceDataSet(train_x, train_y), batch_size=batch_size, shuffle=True))
+    loader = DataLoader(TraceDataSet(train_x, train_y), batch_size=batch_size, shuffle=True)
 
     # training the model
     for epoch in range(n_epochs):
         print("epoch:{0}".format(str(epoch)))
-        for i in range(0, train_x.size()[0], batch_size):
-            print("batch:{0}".format(str(i)))
-            batch_x, batch_y = loader.next()
+        # loader = iter(loader)
+        # for i in range(0, train_x.size()[0], batch_size):
+        for batch_idx, (batch_x, batch_y) in enumerate(loader):
+            # print("batch:{0}".format(str(i)))
 
-            train(epoch, i, model, batch_x, batch_y, val_x,
+            # batch_x, batch_y = loader.next()
+
+            train(epoch, model, batch_x, batch_y, val_x,
                   val_y, optimizer, criterion, train_losses, val_losses)
 
     losses = {"train" : train_losses, "val" : val_losses}
+
+    # print("trying to save cnn losses")
+    # with open(r'../../../cnn_losses.pickle', 'wb') as handle:
+    #     pickle.dump(losses, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("trying to save cnn model")
+    # with open(r'../../../cnn_model.pickle', 'wb') as handle:
+    #     pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("saved")
 
     print("trying to save cnn losses")
     with open(r'/scratch/kohler.d/code_output/biosim/cnn_losses.pickle', 'wb') as handle:
