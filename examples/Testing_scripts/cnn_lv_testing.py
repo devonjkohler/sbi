@@ -262,8 +262,9 @@ def main():
     with open(r'/scratch/kohler.d/code_output/biosim/cnn_losses.pickle', 'wb') as handle:
         pickle.dump(losses, handle, protocol=pickle.HIGHEST_PROTOCOL)
     print("trying to save cnn model")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_model.pickle', 'wb') as handle:
-        pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_model.pickle', 'wb') as handle:
+    #     pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    torch.save(model.state_dict(), r'/scratch/kohler.d/code_output/biosim')
     print("saved")
 
 if __name__ == '__main__':
