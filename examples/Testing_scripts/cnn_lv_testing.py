@@ -167,10 +167,12 @@ def main():
         torch.tensor([0.03, 0.01, 0.05])
     )
 
+    obs_len = 3000
+
     # Sample 10000 traces
     obs_list = list()
     labels = list()
-    for i in range(1500):
+    for i in range(obs_len):
         prior_sample = prior.sample()
         labels.append(prior_sample)
         obs_list.append(gillespie_simulator(prior_sample))
@@ -213,8 +215,8 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(1425, 1, 3, 3000)
-    val_x = val_x.reshape(75, 1, 3, 3000)
+    train_x = train_x.reshape(obs_len*.95, 1, 3, 3000)
+    val_x = val_x.reshape(obs_len*.05, 1, 3, 3000)
 
     # defining the model
     model = Net()
@@ -226,7 +228,7 @@ def main():
     #     criterion = criterion.cuda()
 
     # defining the number of epochs
-    n_epochs = 20
+    n_epochs = 30
     batch_size = 512
     # empty list to store training losses
     train_losses = []
