@@ -167,7 +167,7 @@ def main():
         torch.tensor([0.03, 0.01, 0.05])
     )
 
-    obs_len = 3000
+    obs_len = 5000
 
     # Sample 10000 traces
     obs_list = list()
@@ -215,8 +215,8 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(obs_len*.95, 1, 3, 3000)
-    val_x = val_x.reshape(obs_len*.05, 1, 3, 3000)
+    train_x = train_x.reshape(int(obs_len*.95), 1, 3, 3000)
+    val_x = val_x.reshape(int(obs_len*.05), 1, 3, 3000)
 
     # defining the model
     model = Net()
