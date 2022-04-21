@@ -121,7 +121,7 @@ class TraceDataSet(Dataset):
     return _x, _y
 
 ## CNN train function
-def train(epoch, model, train_x, train_y, val_x, val_y,
+def train(epoch, batch_idx, model, train_x, train_y, val_x, val_y,
           optimizer, criterion, train_losses, val_losses):
     model.train()
     tr_loss = 0
@@ -155,8 +155,8 @@ def train(epoch, model, train_x, train_y, val_x, val_y,
     tr_loss = loss_train.item()
     # if epoch % 256 == 0:
         # printing the validation loss
-    print('epoch : ', epoch + 1, '\t', 'val loss :', loss_val)
-    print('epoch : ', epoch + 1, '\t', 'train loss :', loss_train)
+    print('batch_idx : ', batch_idx, '\t', 'val loss :', loss_val, flush=True)
+    print('batch_idx : ', batch_idx, '\t', 'train loss :', loss_train, flush=True)
 
 
 def main():
@@ -167,7 +167,7 @@ def main():
     #     torch.tensor([0.03, 0.01, 0.05])
     # )
     #
-    # obs_len = 5000
+    obs_len = 5000
     #
     # # Sample 10000 traces
     # obs_list = list()
@@ -228,7 +228,7 @@ def main():
     #     criterion = criterion.cuda()
 
     # defining the number of epochs
-    n_epochs = 30
+    n_epochs = 10
     batch_size = 64
     # empty list to store training losses
     train_losses = []
@@ -239,7 +239,7 @@ def main():
 
     # training the model
     for epoch in range(n_epochs):
-        print("epoch:{0}".format(str(epoch)))
+        print("epoch:{0}".format(str(epoch)), flush=True)
         # loader = iter(loader)
         # for i in range(0, train_x.size()[0], batch_size):
         for batch_idx, (batch_x, batch_y) in enumerate(loader):
@@ -247,7 +247,7 @@ def main():
 
             # batch_x, batch_y = loader.next()
 
-            train(epoch, model, batch_x, batch_y, val_x,
+            train(epoch, batch_idx, model, batch_x, batch_y, val_x,
                   val_y, optimizer, criterion, train_losses, val_losses)
 
     losses = {"train" : train_losses, "val" : val_losses}
