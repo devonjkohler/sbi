@@ -155,8 +155,8 @@ def train(epoch, batch_idx, model, train_x, train_y, val_x, val_y,
     tr_loss = loss_train.item()
     # if epoch % 256 == 0:
         # printing the validation loss
-    print('batch_idx : ', batch_idx, '\t', 'val loss :', loss_val, flush=True)
-    print('batch_idx : ', batch_idx, '\t', 'train loss :', loss_train, flush=True)
+    print('batch_idx : ', batch_idx, '\t', 'val loss :', loss_val)
+    print('batch_idx : ', batch_idx, '\t', 'train loss :', loss_train)
 
 
 def main():
@@ -167,7 +167,7 @@ def main():
     #     torch.tensor([0.03, 0.01, 0.05])
     # )
     #
-    obs_len = 5000
+    obs_len = 3000
     #
     # # Sample 10000 traces
     # obs_list = list()
@@ -199,8 +199,8 @@ def main():
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
     print("data loaded")
-    # x = x[:1500]
-    # y = y[:1500]
+    x = x[:obs_len]
+    y = y[:obs_len]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
@@ -239,7 +239,7 @@ def main():
 
     # training the model
     for epoch in range(n_epochs):
-        print("epoch:{0}".format(str(epoch)), flush=True)
+        print("epoch:{0}".format(str(epoch)))
         # loader = iter(loader)
         # for i in range(0, train_x.size()[0], batch_size):
         for batch_idx, (batch_x, batch_y) in enumerate(loader):
