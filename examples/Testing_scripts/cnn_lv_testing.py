@@ -161,46 +161,46 @@ def train(epoch, batch_idx, model, train_x, train_y, val_x, val_y,
 
 def main():
 
-    # # Prior used to train nn (need it to span area for inference)
-    # prior = utils.BoxUniform(
-    #     torch.tensor([0.001, 0.0001, 0.01]),
-    #     torch.tensor([0.03, 0.01, 0.05])
-    # )
-    #
-    obs_len = 3000
-    #
-    # # Sample 10000 traces
-    # obs_list = list()
-    # labels = list()
-    # for i in range(obs_len):
-    #     prior_sample = prior.sample()
-    #     labels.append(prior_sample)
-    #     obs_list.append(gillespie_simulator(prior_sample))
-    #
-    # x = torch.stack(obs_list, axis=0)
-    # y = torch.stack(labels, axis=0)
-    #
-    # # Save observations
-    # print("trying to save cnn obs")
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'wb') as handle:
-    #     pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # print("trying to save cnn labels")
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'wb') as handle:
-    #     pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # print("saved")
+    # Prior used to train nn (need it to span area for inference)
+    prior = utils.BoxUniform(
+        torch.tensor([0.001, 0.0001, 0.01]),
+        torch.tensor([0.03, 0.01, 0.05])
+    )
 
-    print("loading data")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'rb') as handle:
-        x = pickle.load(handle)
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
-        y = pickle.load(handle)
+    obs_len = 10000
+
+    # Sample 10000 traces
+    obs_list = list()
+    labels = list()
+    for i in range(obs_len):
+        prior_sample = prior.sample()
+        labels.append(prior_sample)
+        obs_list.append(gillespie_simulator(prior_sample))
+
+    x = torch.stack(obs_list, axis=0)
+    y = torch.stack(labels, axis=0)
+
+    # Save observations
+    print("trying to save cnn obs")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'wb') as handle:
+        pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print("trying to save cnn labels")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'wb') as handle:
+        pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print("saved")
+
+    # print("loading data")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'rb') as handle:
+    #     x = pickle.load(handle)
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
+    #     y = pickle.load(handle)
     # with open(r'../../../cnn_lv_obs.pickle', 'rb') as handle:
     #     x = pickle.load(handle)
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
     print("data loaded")
-    x = x[:obs_len]
-    y = y[:obs_len]
+    # x = x[:obs_len]
+    # y = y[:obs_len]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
