@@ -192,14 +192,16 @@ def main():
         x = pickle.load(handle)
     with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
         y = pickle.load(handle)
+
+    state = torch.load(r'/scratch/kohler.d/code_output/biosim/cnn_model_state.pth')
     # with open(r'../../../cnn_lv_obs.pickle', 'rb') as handle:
     #     x = pickle.load(handle)
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
     print("data loaded")
-    training_obs = 2500
-    x = x[0:training_obs]
-    y = y[0:training_obs]
+    training_obs = 2000
+    x = x[2000:4000]
+    y = y[2000:4000]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
@@ -221,6 +223,8 @@ def main():
     model = Net()
     optimizer = Adam(model.parameters(), lr=0.0005)
     criterion = CrossEntropyLoss()
+    model.load_state_dict(state['state_dict'])
+    optimizer.load_state_dict(state['optimizer'])
 
     # if torch.cuda.is_available():
     #     model = model.cuda()
