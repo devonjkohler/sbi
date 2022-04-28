@@ -28,7 +28,7 @@ def gillespie_simulator(propose_rates):
 
     transition_matrix = torch.tensor([[1, 0], [-1, 1], [0, -1]])
 
-    for i in range(3001):
+    for i in range(5001):
 
         sampling_weights = [f(s) for f in rate_functions]
         total_weight = sum(sampling_weights)
@@ -41,8 +41,8 @@ def gillespie_simulator(propose_rates):
         s = torch.normal(s, .25)
         s[0] = max(1, s[0])
         s[1] = max(1, s[1])
-
-        path = torch.cat((path, np.insert(s, 0, t, axis=0).reshape(1, 3)), axis=0)
+        if i % 5 == 0:
+            path = torch.cat((path, np.insert(s, 0, t, axis=0).reshape(1, 3)), axis=0)
 
     return path[2:].T
 
@@ -54,20 +54,20 @@ class Net(Module):
         self.cnn_layers = Sequential(
 
             # Defining a 2D convolution layer
-            Conv2d(1, 64, kernel_size=(3, 3), padding=(1, 0)),
+            Conv2d(1, 64, kernel_size=(3,3), padding=(1,0)),
             ReLU(inplace=True),
-            Conv2d(64, 64, kernel_size=(3, 3), padding=(1, 0)),
+            Conv2d(64, 64, kernel_size=(3,3), padding=(1,0)),
             ReLU(inplace=True),
-            MaxPool2d((1, 6)),
-            Conv2d(64, 128, kernel_size=(3, 3), padding=(1, 0)),
+            MaxPool2d((1,5)),
+            Conv2d(64, 128, kernel_size=(3,3), padding=(1,0)),
             ReLU(inplace=True),
-            MaxPool2d((1, 6)),
-            Conv2d(128, 128, kernel_size=(3, 3), padding=(1, 0)),
+            MaxPool2d((1,5)),
+            Conv2d(128, 128, kernel_size=(3,3), padding=(1,0)),
             ReLU(inplace=True),
-            MaxPool2d((1, 6)),
-            Conv2d(128, 128, kernel_size=(3, 3), padding=(1, 0)),
+            MaxPool2d((1,5)),
+            Conv2d(128, 128, kernel_size=(3,3), padding=(1,0)),
             ReLU(inplace=True),
-            AvgPool2d(kernel_size=(1, 6))
+            AvgPool2d(kernel_size=(1,5))
         )
 
         self.linear_layers = Sequential(
@@ -162,46 +162,46 @@ def train(epoch, batch_idx, model, train_x, train_y, val_x, val_y,
 def main():
 
     # Prior used to train nn (need it to span area for inference)
-    # prior = utils.BoxUniform(
-    #     torch.tensor([0.001, 0.0001, 0.01]),
-    #     torch.tensor([0.03, 0.01, 0.05])
-    # )
+    prior = utils.BoxUniform(
+        torch.tensor([0.005, 0.0001, 0.01]),
+        torch.tensor([0.02, 0.001, 0.05])
+    )
 
     # # Sample 10000 traces
-    # obs_list = list()
-    # labels = list()
-    # for i in range(10000):
-    #     prior_sample = prior.sample()
-    #     labels.append(prior_sample)
-    #     obs_list.append(gillespie_simulator(prior_sample))
-    #
-    # x = torch.stack(obs_list, axis=0)
-    # y = torch.stack(labels, axis=0)
+    obs_list = list()
+    labels = list()
+    for i in range(10000):
+        prior_sample = prior.sample()
+        labels.append(prior_sample)
+        obs_list.append(gillespie_simulator(prior_sample))
+
+    x = torch.stack(obs_list, axis=0)
+    y = torch.stack(labels, axis=0)
 
     # Save observations
-    # print("trying to save cnn obs")
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'wb') as handle:
-    #     pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # print("trying to save cnn labels")
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'wb') as handle:
-    #     pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    # print("saved")
+    print("trying to save cnn obs")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'wb') as handle:
+        pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print("trying to save cnn labels")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'wb') as handle:
+        pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print("saved")
 
-    print("loading data")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'rb') as handle:
-        x = pickle.load(handle)
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
-        y = pickle.load(handle)
+    # print("loading data")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'rb') as handle:
+    #     x = pickle.load(handle)
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
+    #     y = pickle.load(handle)
 
-    state = torch.load(r'/scratch/kohler.d/code_output/biosim/cnn_model_state.pth')
+    # state = torch.load(r'/scratch/kohler.d/code_output/biosim/cnn_model_state.pth')
     # with open(r'../../../cnn_lv_obs.pickle', 'rb') as handle:
     #     x = pickle.load(handle)
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
-    print("data loaded")
-    training_obs = 2000
-    x = x[2000:4000]
-    y = y[2000:4000]
+    # print("data loaded")
+    training_obs = 10000
+    # x = x[2000:4000]
+    # y = y[2000:4000]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
@@ -216,23 +216,23 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(int(training_obs*.95), 1, 3, 3000)
-    val_x = val_x.reshape(int(training_obs*.05), 1, 3, 3000)
+    train_x = train_x.reshape(int(training_obs*.98), 1, 3, 3000)
+    val_x = val_x.reshape(int(training_obs*.02), 1, 3, 3000)
 
     # defining the model
     model = Net()
-    optimizer = Adam(model.parameters(), lr=0.0005)
+    optimizer = Adam(model.parameters(), lr=0.0001)
     criterion = CrossEntropyLoss()
-    model.load_state_dict(state['state_dict'])
-    optimizer.load_state_dict(state['optimizer'])
+    # model.load_state_dict(state['state_dict'])
+    # optimizer.load_state_dict(state['optimizer'])
 
     # if torch.cuda.is_available():
     #     model = model.cuda()
     #     criterion = criterion.cuda()
 
     # defining the number of epochs
-    n_epochs = 15
-    batch_size = 64
+    n_epochs = 30
+    batch_size = 32
     # empty list to store training losses
     train_losses = []
     # empty list to store validation losses
@@ -269,12 +269,12 @@ def main():
     }
 
     print("trying to save cnn losses")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_losses_state_0.pickle', 'wb') as handle:
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_losses_new_obs_config.pickle', 'wb') as handle:
         pickle.dump(losses, handle, protocol=pickle.HIGHEST_PROTOCOL)
     print("trying to save cnn model")
     # with open(r'/scratch/kohler.d/code_output/biosim/cnn_model.pickle', 'wb') as handle:
     #     pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    torch.save(state, r'/scratch/kohler.d/code_output/biosim/cnn_model_state.pth')
+    torch.save(state, r'/scratch/kohler.d/code_output/biosim/cnn_model_new_obs_config.pth')
     print("saved")
 
 if __name__ == '__main__':
