@@ -166,39 +166,39 @@ def main():
         torch.tensor([0.005, 0.0001, 0.01]),
         torch.tensor([0.02, 0.001, 0.05])
     )
-
-    # # Sample 10000 traces
-    obs_list = list()
-    labels = list()
-    for i in range(10000):
-        prior_sample = prior.sample()
-        labels.append(prior_sample)
-        obs_list.append(gillespie_simulator(prior_sample))
-
-    x = torch.stack(obs_list, axis=0)
-    y = torch.stack(labels, axis=0)
+    #
+    # # # Sample 10000 traces
+    # obs_list = list()
+    # labels = list()
+    # for i in range(10000):
+    #     prior_sample = prior.sample()
+    #     labels.append(prior_sample)
+    #     obs_list.append(gillespie_simulator(prior_sample))
+    #
+    # x = torch.stack(obs_list, axis=0)
+    # y = torch.stack(labels, axis=0)
 
     # Save observations
-    print("trying to save cnn obs")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'wb') as handle:
-        pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print("trying to save cnn labels")
-    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'wb') as handle:
-        pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print("saved")
+    # print("trying to save cnn obs")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_new_strat.pickle', 'wb') as handle:
+    #     pickle.dump(x, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("trying to save cnn labels")
+    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_new_strat.pickle', 'wb') as handle:
+    #     pickle.dump(y, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # print("saved")
 
-    # print("loading data")
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_smaller_prior.pickle', 'rb') as handle:
-    #     x = pickle.load(handle)
-    # with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_smaller_prior.pickle', 'rb') as handle:
-    #     y = pickle.load(handle)
+    print("loading data")
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_obs_new_strat.pickle', 'rb') as handle:
+        x = pickle.load(handle)
+    with open(r'/scratch/kohler.d/code_output/biosim/cnn_lv_labels_new_strat.pickle', 'rb') as handle:
+        y = pickle.load(handle)
 
     # state = torch.load(r'/scratch/kohler.d/code_output/biosim/cnn_model_state.pth')
     # with open(r'../../../cnn_lv_obs.pickle', 'rb') as handle:
     #     x = pickle.load(handle)
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
-    # print("data loaded")
+    print("data loaded")
     training_obs = 10000
     # x = x[2000:4000]
     # y = y[2000:4000]
@@ -216,8 +216,8 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(int(training_obs*.98), 1, 3, 3000)
-    val_x = val_x.reshape(int(training_obs*.02), 1, 3, 3000)
+    train_x = train_x.reshape(int(training_obs*.98), 1, 3, 1000)
+    val_x = val_x.reshape(int(training_obs*.02), 1, 3, 1000)
 
     # defining the model
     model = Net()
