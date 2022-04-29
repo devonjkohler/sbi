@@ -199,9 +199,9 @@ def main():
     # with open(r'../../../cnn_lv_labels.pickle', 'rb') as handle:
     #     y = pickle.load(handle)
     print("data loaded")
-    training_obs = 10000
-    # x = x[2000:4000]
-    # y = y[2000:4000]
+    training_obs = 5000
+    x = x[:training_obs]
+    y = y[:training_obs]
     ## Prepare data
     v0_min = x[:, 0].min()
     v0_max = x[:, 0].max()
@@ -216,8 +216,8 @@ def main():
     x[:, 2] = (x[:, 2] - v2_min) / (v2_max - v2_min)
 
     train_x, val_x, train_y, val_y = train_test_split(x, y, test_size=0.05)
-    train_x = train_x.reshape(int(training_obs*.98), 1, 3, 1000)
-    val_x = val_x.reshape(int(training_obs*.02), 1, 3, 1000)
+    train_x = train_x.reshape(int(training_obs*.95), 1, 3, 1000)
+    val_x = val_x.reshape(int(training_obs*.05), 1, 3, 1000)
 
     # defining the model
     model = Net()
@@ -252,6 +252,19 @@ def main():
 
             train(epoch, batch_idx, model, batch_x, batch_y, val_x,
                   val_y, optimizer, criterion, train_losses, val_losses)
+
+        if epoch % 10 == 0:
+            losses = {"train": train_losses, "val": val_losses}
+            state = {
+                'epoch' : epoch
+                'state_dict': model.state_dict(),
+                'optimizer': optimizer.state_dict(),
+            }
+            with open(r'/scratch/kohler.d/code_output/biosim/cnn_losses_temp.pickle', 'wb') as handle:
+                pickle.dump(losses, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            # with open(r'/scratch/kohler.d/code_output/biosim/cnn_model.pickle', 'wb') as handle:
+            #     pickle.dump(model, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            torch.save(state, r'/scratch/kohler.d/code_output/biosim/cnn_model_temp.pth')
 
     losses = {"train" : train_losses, "val" : val_losses}
 
