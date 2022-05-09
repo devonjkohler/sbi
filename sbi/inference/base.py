@@ -30,6 +30,50 @@ from sbi.utils.sbiutils import get_simulations_since_round
 from sbi.utils.torchutils import check_if_prior_on_device, process_device
 from sbi.utils.user_input_checks import prepare_for_sbi
 
+def simulate(
+    simulator: Callable,
+    prior: Distribution,
+    num_simulations: int,
+    num_workers: int = 1,
+) -> NeuralPosterior:
+    r"""Runs simulation-based inference and returns the posterior.
+
+    This function provides a simple interface to run sbi. Inference is run for a single
+    round and hence the returned posterior $p(\theta|x)$ can be sampled and evaluated
+    for any $x$ (i.e. it is amortized).
+
+    The scope of this function is limited to the most essential features of sbi. For
+    more flexibility (e.g. multi-round inference, different density estimators) please
+    use the flexible interface described here:
+    https://www.mackelab.org/sbi/tutorial/02_flexible_interface/
+
+    Args:
+        simulator: A function that takes parameters $\theta$ and maps them to
+            simulations, or observations, `x`, $\mathrm{sim}(\theta)\to x$. Any
+            regular Python callable (i.e. function or class with `__call__` method)
+            can be used.
+        prior: A probability distribution that expresses prior knowledge about the
+            parameters, e.g. which ranges are meaningful for them. Any
+            object with `.log_prob()`and `.sample()` (for example, a PyTorch
+            distribution) can be used.
+        method: What inference method to use. Either of SNPE, SNLE or SNRE.
+        num_simulations: Number of simulation calls. More simulations means a longer
+            runtime, but a better posterior estimate.
+        num_workers: Number of parallel workers to use for simulations.
+
+    Returns: Posterior over parameters conditional on observations (amortized).
+    """
+
+
+    simulator, prior = prepare_for_sbi(simulator, prior)
+
+    theta, x = simulate_for_sbi(
+        simulator=simulator,
+        proposal=prior,
+        num_simulations=num_simulations,
+        num_workers=num_workers,
+    )
+    return theta, x
 
 def infer(
     simulator: Callable,
